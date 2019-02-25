@@ -3,7 +3,11 @@ require 'sqlite3'
 
 class Pokemon
   attr_accessor :id, :name, :type, :db, :hp
-  def initialize(db)
+  def initialize(name: nil, id: nil, type: nil, db: nil, hp: nil)
+    self.hp = hp
+    self.name = name
+    self.type = type
+    self.id = id
     self.db = db
   end
 
@@ -12,19 +16,12 @@ class Pokemon
   end
 
   def self.find(id, db)
-    pokemon_from_db = Pokemon.new(db)
     db.results_as_hash = TRUE
     found_pokemon = db.execute("SELECT * FROM pokemon WHERE id = ? ", [id])[0]
-    pokemon_from_db.id = found_pokemon["id"]
-    pokemon_from_db.name = found_pokemon["name"]
-    pokemon_from_db.type = found_pokemon["type"]
-    pokemon_from_db.hp = found_pokemon["hp"]
-    return pokemon_from_db #this feels so clunky...
+    Pokemon.new(name: found_pokemon["name"], id: found_pokemon["id"], type: found_pokemon["type"], db: db, hp: found_pokemon["hp"])
   end
 
   def alter_hp(hp, db)
-    @db.execute("UPDATE pokemon SET hp = (?) WHERE name = (?)", [hp, self.name])
+    db.execute("UPDATE pokemon SET hp = (?) WHERE name = (?)", [hp, self.name])
   end
-
-
 end
